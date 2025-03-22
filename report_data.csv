@@ -1,0 +1,11 @@
+report_text,Disease
+"The patient shows elevated WBC count and fever symptoms, suggestive of an infection.",Infection
+"The patient exhibits normal blood count with mild fatigue and no other significant symptoms.",Normal
+"High RBC count with low hemoglobin level, associated with symptoms of dizziness and weakness.",Normal
+"The patient's reports indicate viral fever with elevated temperature and RBC count.",Viral Fever
+"Low WBC and RBC count with a significant reduction in hemoglobin, suggests anemia.",Normal
+"Very high WBC count, possibly due to bacterial infection, with the presence of fever.",Bacterial Infection
+"Moderate RBC count with a slight increase in glucose levels, no clear disease indication.",Normal
+"Symptoms align with viral fever, including low RBC and WBC count, and mild headache.",Viral Fever
+"High WBC count, low RBC count, and severe symptoms of fever, indicating a bacterial infection.",Bacterial Infection
+"Normal WBC count and RBC levels with a slightly elevated glucose level, no disease found.",Normal

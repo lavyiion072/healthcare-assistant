@@ -1,0 +1,17 @@
+Symptom,AgeGroup,Severity,Duration,medicine_1,company_1,description_1,dosage_1,course_days_1,price_1,quantity_1,medicine_2,company_2,description_2,dosage_2,course_days_2,price_2,quantity_2,tests_suggested
+fever,adult,low,2,Paracetamol,Cipla,Reduces fever and mild pain,2/day,3,₹20,6,Crocin,GSK,Pain relief and temperature control,2/day,3,₹25,6,None
+cold,child,medium,3,ORS,Abbott,Restores electrolytes and hydration,3/day,5,₹30,5,Electral,GSK,Replenishes lost fluids,2/day,5,₹28,5,"CBC, Nasal swab test"
+cough,adult,high,4,Benadryl,Pfizer,Relieves cough and throat irritation,2/day,7,₹80,1 bottle,Corex,Pfizer,Strong syrup for persistent cough,2/day,7,₹90,1 bottle,"Chest X-ray, CBC"
+headache,adult,medium,1,Aspirin,Bayer,Relieves headache and reduces inflammation,1/day,2,₹15,2,Ibuprofen,Dr Reddy's,Anti-inflammatory and pain relief,2/day,2,₹18,4,None
+sore throat,child,low,2,Strepsils,Reckitt,Soothes throat and reduces discomfort,3/day,3,₹25,9 lozenges,Paracetamol,Cipla,Fever and pain relief,2/day,3,₹20,6,Throat swab test
+stomach ache,adult,medium,2,Drotin,Mankind,Relieves stomach cramps,2/day,3,₹22,6,Spasmoproxyvon,Sun Pharma,Reduces abdominal pain,1/day,3,₹30,3,Abdominal ultrasound
+diarrhea,child,high,2,ORS,Abbott,Prevents dehydration and restores fluids,3/day,5,₹30,5,Zincovit,FDC,Boosts immunity during illness,1/day,5,₹35,5,"Stool test, CBC"
+vomiting,adult,medium,1,Ondansetron,Cadila,Prevents nausea and vomiting,2/day,2,₹25,4,Domperidone,Sun Pharma,Controls vomiting,1/day,2,₹22,2,None
+allergy,adult,low,2,Loratadine,Cipla,Relieves allergic symptoms,1/day,5,₹18,5,Cetirizine,Dr Reddy's,Reduces allergic reaction,1/day,5,₹20,5,Allergy panel test
+fever,child,medium,3,Calpol,GSK,Fever reduction for children,2/day,3,₹20,6,Ibuprofen,GSK,Pain relief and anti-inflammatory,2/day,3,₹18,6,None
+malaria,adult,high,5,Chloroquine,Ipca,Kills malaria parasite,2/day,5,₹60,10,Artemether,Cipla,Treats acute malaria,2/day,3,₹90,6,Malaria antigen test
+dengue,adult,high,5,Paracetamol,Cipla,Reduces fever and mild pain,2/day,5,₹20,10,ORS,Abbott,Prevents dehydration,3/day,5,₹30,5,"Dengue NS1, CBC"
+typhoid,adult,high,7,Ciprofloxacin,Cipla,Antibiotic for bacterial infection,2/day,7,₹70,14,Paracetamol,GSK,Reduces fever,2/day,5,₹25,10,Widal test
+chikungunya,adult,high,5,Paracetamol,Cipla,Reduces fever and joint pain,2/day,5,₹20,10,Ibuprofen,Dr Reddy's,Pain relief and inflammation,2/day,5,₹18,10,Chikungunya IgM
+tuberculosis,adult,high,180,Isoniazid,Lupin,Kills TB bacteria,1/day,180,₹500,180,Rifampicin,Sun Pharma,Antibiotic for TB,1/day,180,₹600,180,"Chest X-ray, Sputum test"
+covid-19,adult,high,7,Paracetamol,Cipla,Reduces fever and pain,2/day,5,₹20,10,Azithromycin,Pfizer,Antibiotic for bacterial infection,1/day,5,₹50,5,"RT-PCR, CBC"
