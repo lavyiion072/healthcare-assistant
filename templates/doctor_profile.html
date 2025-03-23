@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Profile | HealthCare Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary">Edit Profile</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="name" value="{{ doctor.name }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Designation</label>
+            <input type="text" class="form-control" name="designation" value="{{ doctor.designation }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Specialization</label>
+            <input type="text" class="form-control" name="specialization" value="{{ doctor.specialization }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Degree</label>
+            <input type="text" class="form-control" name="degree" value="{{ doctor.degree }}">
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Start Time</label>
+                <input type="time" class="form-control" name="start_time" value="{{ doctor.start_time }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">End Time</label>
+                <input type="time" class="form-control" name="end_time" value="{{ doctor.end_time }}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Availability Days (comma-separated)</label>
+            <input type="text" class="form-control" name="availability" value="{{ doctor.availability }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Service Area</label>
+            <input type="text" class="form-control" name="service_area" value="{{ doctor.service_area }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Clinic Location</label>
+            <input type="text" class="form-control" name="clinic_location" value="{{ doctor.clinic_location }}">
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Latitude</label>
+                <input type="number" step="any" class="form-control" name="latitude" value="{{ doctor.latitude }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Longitude</label>
+                <input type="number" step="any" class="form-control" name="longitude" value="{{ doctor.longitude }}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Standard Fee (₹)</label>
+                <input type="number" step="0.01" class="form-control" name="standard_fee" value="{{ doctor.standard_fee }}">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Emergency Fee (₹)</label>
+                <input type="number" step="0.01" class="form-control" name="emergency_fee" value="{{ doctor.emergency_fee }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

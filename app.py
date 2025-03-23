@@ -248,6 +248,19 @@ def register():
         name = request.form['name']
         mobile = request.form['mobile']
         password = request.form['password']
+        designation = request.form['designation']
+        specialization = request.form['specialization']
+        degree = request.form['degree']
+        start_time = request.form['start_time']
+        end_time = request.form['end_time']
+        availability = request.form['availability']
+        service_area = request.form['service_location']
+        clinic_location = request.form['clinic_location']
+        latitude = request.form['latitude']
+        longitude = request.form['longitude']
+        appointment_available = request.form['appointment_available']
+        standard_fee = request.form['standard_fee']
+        emergency_fee = request.form['emergency_fee']
         role = request.form.get('form_type')
         print(role)
 
@@ -255,7 +268,24 @@ def register():
 
         try:
             if role == 'doctor':
-                new_user = Doctor(name=name, mobile=mobile, password=hashed_pw)
+                new_user = Doctor(name=name, 
+                                  mobile=mobile, 
+                                  password=hashed_pw, 
+                                  designation=designation, 
+                                  specialization=specialization,
+                                  degree=degree,
+                                  start_time=start_time,
+                                  end_time=end_time,
+                                  availability=availability,
+                                  service_area=service_area,
+                                  clinic_location=clinic_location,
+                                  latitude=latitude,
+                                  longitude=longitude,
+                                  appointment_available=appointment_available,
+                                  standard_fee=standard_fee,
+                                  emergency_fee=emergency_fee
+                                  )
+                
             elif role == 'laboratory':
                 new_user = Laboratory(name=name, mobile=mobile, password=hashed_pw)
             else:
@@ -278,7 +308,40 @@ def doctor_dashboard():
     if session.get('role') != 'doctor':
         flash('Unauthorized access', 'danger')
         return redirect(url_for('login'))
-    return render_template('doctor_dashboard.html')
+    doctor = current_user
+    session['doctor_id'] = doctor.id
+    return render_template('doctor_dashboard.html', doctor=doctor)
+
+@app.route('/doctor_dashboard', methods=['GET', 'POST'])
+@login_required
+def update_profile():
+    doctor_id = session['doctor_id']
+    doctor = Doctor.query.get(doctor_id)
+    if not doctor:
+        flash('Doctor not found!')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        doctor.name = request.form['name']
+        doctor.designation = request.form['designation']
+        doctor.specialization = request.form['specialization']
+        doctor.degree = request.form['degree']
+        doctor.start_time = request.form['start_time']
+        doctor.end_time = request.form['end_time']
+        # doctor.appointment_available= request.form['appointment_available']
+        doctor.availability = request.form['availability']
+        doctor.service_area = request.form['service_location']
+        doctor.clinic_location = request.form['clinic_location']
+        doctor.latitude = request.form['latitude']
+        doctor.longitude = request.form['longitude']
+        doctor.standard_fee = request.form['standard_fee']
+        doctor.emergency_fee = request.form['emergency_fee']
+
+        db.session.commit()
+        flash('Profile updated successfully!')
+        return redirect(url_for('doctor_dashboard'))
+    return render_template('doctor_dashboard.html', doctor=doctor)
+
 
 @app.route('/lab_dashboard')
 @login_required
