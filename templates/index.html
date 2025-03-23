@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Healthcare Assistant</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #e0f7fa, #ffffff);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Advanced Banner */
+        .banner {
+            background: linear-gradient(to right, rgba(0,180,216,0.8), rgba(0,119,182,0.8)),
+                        url('https://images.unsplash.com/photo-1588776814546-ec7e70f6c5c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover;
+            padding: 10px 10px;
+            color: white;
+            text-align: center;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            box-shadow: 0 10px 30px rgba(0, 119, 182, 0.3);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInDown 1s ease-in-out;
+        }
+
+        .banner h1 {
+            font-size: 48px;
+            margin: 0;
+            font-weight: 800;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .banner p {
+            font-size: 20px;
+            margin-top: 10px;
+            opacity: 0.95;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .banner-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .tab-container {
+            max-width: 900px;
+            margin: 50px auto;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 119, 182, 0.2);
+            overflow: hidden;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #caf0f8;
+            border-bottom: 2px solid #90e0ef;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #023e8a;
+            transition: background 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: #00b4d8;
+            color: white;
+        }
+
+        .form-section {
+            display: none;
+            padding: 30px;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0077b6;
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #023e8a;
+            display: block;
+            margin-top: 15px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #90e0ef;
+            border-radius: 8px;
+            background-color: #f0f9ff;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            border-color: #00b4d8;
+            outline: none;
+        }
+
+        button {
+            background: #00b4d8;
+            color: #ffffff;
+            border: none;
+            padding: 12px 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #0077b6;
+        }
+
+        .result {
+            background: #caf0f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px auto;
+            width: 90%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .result h2 {
+            color: #023e8a;
+            margin-bottom: 15px;
+        }
+
+        .result p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .file-upload-wrapper {
+            width: 100%;
+            background-color: #f0f9ff;
+            border: 2px dashed #90e0ef;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s ease, border-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .file-upload-wrapper:hover {
+            background-color: #e0f7fa;
+            border-color: #00b4d8;
+        }
+
+        .file-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .file-icon {
+            font-size: 50px;
+            color: #00b4d8;
+            margin-bottom: 15px;
+        }
+
+        .file-text {
+            font-size: 16px;
+            color: #023e8a;
+            font-weight: bold;
+        }
+
+        #file-name {
+            font-style: italic;
+            margin-top: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+
+            .banner h1 {
+                font-size: 32px;
+            }
+
+            .banner p {
+                font-size: 16px;
+            }
+
+            .banner-icon {
+                font-size: 50px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Advanced Banner Section -->
+    <div class="banner">
+        <div class="banner-icon">🤖</div>
+        <h1>Smart Healthcare Assistant</h1>
+        <p>Your Personalized AI-Based Medical Helper</p>
+    </div>
+
+    <!-- Main Tab Container -->
+    <div class="tab-container">
+        <div class="tabs">
+            <div class="tab {% if active_tab == 0 %}active{% endif %}" onclick="showTab(0)">💊 Medicine Assistant</div>
+            <div class="tab {% if active_tab == 1 %}active{% endif %}" onclick="showTab(1)">🔍 Disease Assistant</div>
+            <div class="tab {% if active_tab == 2 %}active{% endif %}" onclick="showTab(2)">🩺 Test Report Diagnosis</div>
+        </div>
+
+        <!-- Medicine Suggestion Form -->
+        <div class="form-section {% if active_tab == 0 %}active{% endif %}">
+            <h1>💊 Medicine Assistant</h1>
+            <form method="POST">
+                <input type="hidden" name="form_type" value="medicine">
+                <label for="symptom">Symptom:</label>
+                <input type="text" name="symptom" id="symptom" placeholder="e.g. fever" required>
+
+                <label for="age_group">Age Group:</label>
+                <select name="age_group" id="age_group" required>
+                    <option value="adult">Adult</option>
+                    <option value="child">Child</option>
+                </select>
+
+                <label for="severity">Severity:</label>
+                <select name="severity" id="severity" required>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+
+                <label for="duration">Duration (days):</label>
+                <input type="number" name="duration" id="duration" min="1" placeholder="e.g. 3" required>
+
+                <button type="submit">Get Medicine Suggestion</button>
+            </form>
+
+            {% if medicine_result and active_tab == 0 %}
+            <div class="result">
+                <h2>Suggested Medicines:</h2>
+                <p><strong>1. {{ medicine_result.medicine_1 }}</strong> by {{ medicine_result.company_1 }}<br>
+                {{ medicine_result.description_1 }}<br>
+                Dosage: {{ medicine_result.dosage_1 }} | Course: {{ medicine_result.course_days_1 }} days<br>
+                Price: {{ medicine_result.price_1 }} | Quantity: {{ medicine_result.quantity_1 }}</p>
+
+                <p><strong>2. {{ medicine_result.medicine_2 }}</strong> by {{ medicine_result.company_2 }}<br>
+                {{ medicine_result.description_2 }}<br>
+                Dosage: {{ medicine_result.dosage_2 }} | Course: {{ medicine_result.course_days_2 }} days<br>
+                Price: {{ medicine_result.price_2 }} | Quantity: {{ medicine_result.quantity_2 }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Disease Prediction Form -->
+        <div class="form-section {% if active_tab == 1 %}active{% endif %}">
+            <h1>🔍 Disease Assistant</h1>
+            <form method="POST">
+                <input type="hidden" name="form_type" value="disease">
+                <label for="symptoms">Enter Symptoms (comma separated):</label>
+                <input type="text" name="symptoms" id="symptoms" placeholder="e.g. fever, cough" required>
+                <button type="submit">Predict Disease</button>
+            </form>
+
+            {% if disease_result and active_tab == 1 %}
+            <div class="result">
+                <h2>Prediction:</h2>
+                <p><strong>Disease:</strong> {{ disease_result }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Diagnosis from Reports -->
+        <div class="form-section {% if active_tab == 2 %}active{% endif %}">
+            <h1>🩺 Test Report Diagnosis</h1>
+            <form method="POST" enctype="multipart/form-data" class="upload-form">
+                <input type="hidden" name="form_type" value="report">
+                <label for="report" class="file-upload-wrapper">
+                    <div class="file-label">
+                        <div class="file-icon">📄</div>
+                        <div class="file-text">Click to Upload Report</div>
+                        <span id="file-name">No file selected</span>
+                    </div>
+                    <input type="file" name="report" id="report" style="display: none;" required onchange="updateFileName()">
+                </label>
+                <button type="submit">Submit Report</button>
+            </form>
+
+            {% if report_diagnosis and active_tab == 2 %}
+            <div class="result">
+                <h2>Diagnosis Result:</h2>
+                <p>{{ report_diagnosis }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function showTab(index) {
+            // Save tab index to localStorage
+            localStorage.setItem('activeTab', index);
+    
+            // Get all tab and form-section elements
+            const tabs = document.querySelectorAll('.tab');
+            const sections = document.querySelectorAll('.form-section');
+    
+            tabs.forEach((tab, i) => {
+                if (i === index) {
+                    tab.classList.add('active');
+                    sections[i].classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                    sections[i].classList.remove('active');
+                }
+            });
+        }
+    
+        // On page load, show the saved tab
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTab = localStorage.getItem('activeTab');
+            const defaultTab = savedTab ? parseInt(savedTab) : 0;
+            showTab(defaultTab);
+        });
+
+        function updateFileName() {
+            const fileInput = document.getElementById('report');
+            const fileNameDisplay = document.getElementById('file-name');
+            const fileName = fileInput.files[0]?.name || 'No file selected';
+            fileNameDisplay.textContent = fileName;
+        }
+    </script>    
+</body>
+</html>
