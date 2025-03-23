@@ -1,15 +1,34 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import pandas as pd
 import fitz  # PyMuPDF
 import pickle
 from difflib import get_close_matches
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
+import secrets
 
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+
+from models import db, Doctor, Laboratory, User
+
+# --- Flask App Setup ---
 app = Flask(__name__)
+app.secret_key = secrets.token_hex(16)
 
-# --- Medicine Suggestion Setup (same as before) ---
+# --- Configurations ---
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///healthcare.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+# --- Load and Train Models ---
 df = pd.read_csv('medicine_data.csv')
+
 symptom_enc = LabelEncoder()
 age_enc = LabelEncoder()
 severity_enc = LabelEncoder()
@@ -21,9 +40,18 @@ df['duration_days'] = df['Duration']
 
 X = df[['symptom_enc', 'age_enc', 'severity_enc', 'duration_days']]
 y = df.index
-model = RandomForestClassifier()
-model.fit(X, y)
 
+medicine_model = RandomForestClassifier()
+medicine_model.fit(X, y)
+
+disease_model = pickle.load(open("disease_prediction_model.pkl", "rb"))
+disease_list = pickle.load(open("disease_list.pkl", "rb"))
+symptom_index = pickle.load(open("symptom_index.pkl", "rb"))
+
+report_model = pickle.load(open("report_diagnosis_model.pkl", "rb"))
+vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
+
+# --- Helper Functions ---
 def suggest_medicines(symptom, age_group, severity, duration):
     known_symptoms = list(symptom_enc.classes_)
     matched = get_close_matches(symptom.lower(), known_symptoms, n=1, cutoff=0.6)
@@ -40,7 +68,7 @@ def suggest_medicines(symptom, age_group, severity, duration):
             'duration_days': duration
         }])
 
-        pred_idx = model.predict(input_df)[0]
+        pred_idx = medicine_model.predict(input_df)[0]
         row = df.loc[pred_idx]
 
         result = {
@@ -51,7 +79,6 @@ def suggest_medicines(symptom, age_group, severity, duration):
             'course_days_1': row['course_days_1'],
             'price_1': row['price_1'],
             'quantity_1': row['quantity_1'],
-
             'medicine_2': row['medicine_2'],
             'company_2': row['company_2'],
             'description_2': row['description_2'],
@@ -59,18 +86,12 @@ def suggest_medicines(symptom, age_group, severity, duration):
             'course_days_2': row['course_days_2'],
             'price_2': row['price_2'],
             'quantity_2': row['quantity_2'],
-
             'recommended_tests': row['tests_suggested'] if pd.notna(row['tests_suggested']) else 'No tests recommended'
         }
         return result
     except Exception as e:
         print(f"Prediction Error: {e}")
         return None
-
-# --- Disease Prediction by Symptoms ---
-disease_model = pickle.load(open("disease_prediction_model.pkl", "rb"))
-disease_list = pickle.load(open("disease_list.pkl", "rb"))
-symptom_index = pickle.load(open("symptom_index.pkl", "rb"))
 
 def predict_disease(symptoms):
     input_data = [0] * len(symptom_index)
@@ -79,23 +100,16 @@ def predict_disease(symptoms):
     for symptom in symptoms:
         symptom = symptom.strip().lower()
         if symptom in symptom_index:
-            index = symptom_index[symptom]
-            input_data[index] = 1
+            input_data[symptom_index[symptom]] = 1
         else:
             close_match = get_close_matches(symptom, all_known_symptoms, n=1, cutoff=0.6)
             if close_match:
-                matched_symptom = close_match[0]
-                index = symptom_index[matched_symptom]
-                input_data[index] = 1
+                input_data[symptom_index[close_match[0]]] = 1
             else:
                 print(f"Unknown symptom ignored: {symptom}")
 
     prediction = disease_model.predict([input_data])[0]
     return disease_list[prediction]
-
-# --- Disease Prediction by Uploaded PDF Report ---
-report_model = pickle.load(open("report_diagnosis_model.pkl", "rb"))
-vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
 def extract_text_from_pdf(file_stream):
     text = ""
@@ -109,7 +123,18 @@ def predict_from_report(text):
     prediction = report_model.predict(transformed_text)[0]
     return prediction
 
-# --- Unified Route for Forms ---
+# --- Login Loader ---
+@login_manager.user_loader
+def load_user(user_id):
+    role = session.get('role')
+    if role == 'doctor':
+        return Doctor.query.get(int(user_id))
+    elif role == 'laboratory':
+        return Laboratory.query.get(int(user_id))
+    else:
+        return User.query.get(int(user_id))
+
+# --- Index Route ---
 @app.route('/', methods=['GET', 'POST'])
 def index():
     medicine_result = None
@@ -120,8 +145,6 @@ def index():
 
     if request.method == 'POST':
         form_type = request.form.get('form_type')
-        print(form_type)
-
         if form_type == 'medicine':
             active_tab = 0
             try:
@@ -130,15 +153,13 @@ def index():
                 severity = request.form.get('severity', '').strip()
                 duration_input = request.form.get('duration', '').strip()
 
-                # Enhanced Input Validation
                 if not (symptom and age_group and severity and duration_input.isdigit()):
-                    raise ValueError("❌ Invalid input. Please make sure all fields are filled correctly.")
-                
+                    raise ValueError("❌ Invalid input. Please fill all fields correctly.")
+
                 duration = int(duration_input)
                 suggestion = suggest_medicines(symptom, age_group, severity, duration)
-                if suggestion:
-                    medicine_result = suggestion
-                else:
+                medicine_result = suggestion if suggestion else None
+                if not suggestion:
                     error = "❌ Unable to find a match for the given input."
             except Exception as e:
                 print(f"Medicine Form Error: {e}")
@@ -152,7 +173,6 @@ def index():
                     raise ValueError("❌ Symptoms cannot be empty.")
                 symptoms_list = [s.strip() for s in symptoms_input.split(',') if s.strip()]
                 disease_result = predict_disease(symptoms_list)
-                print (disease_result)
             except Exception as e:
                 print(f"Disease Prediction Error: {e}")
                 error = f"❌ Could not predict the disease. {str(e)}"
@@ -160,7 +180,6 @@ def index():
         elif form_type == 'report':
             active_tab = 2
             try:
-                print(request.files)
                 file = request.files.get('report')
                 if not file:
                     raise ValueError("❌ No file uploaded.")
@@ -168,7 +187,6 @@ def index():
                 if not text:
                     raise ValueError("❌ No text extracted from PDF.")
                 report_result = predict_from_report(text)
-                print(report_result)
             except Exception as e:
                 print(f"Report Prediction Error: {e}")
                 error = f"❌ Could not process the uploaded report. {str(e)}"
@@ -182,5 +200,102 @@ def index():
         active_tab=active_tab
     )
 
+# --- Login ---
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        mobile = request.form['mobile']
+        password = request.form['password']
+
+        user = User.query.filter_by(mobile=mobile).first()
+        doctor = Doctor.query.filter_by(mobile=mobile).first()
+        lab = Laboratory.query.filter_by(mobile=mobile).first()
+
+        if doctor and bcrypt.check_password_hash(doctor.password, password):
+            login_user(doctor)
+            session['role'] = 'doctor'
+            flash('Doctor login successful!', 'success')
+            return redirect(url_for('doctor_dashboard'))
+
+        elif lab and bcrypt.check_password_hash(lab.password, password):
+            login_user(lab)
+            session['role'] = 'laboratory'
+            flash('Laboratory login successful!', 'success')
+            return redirect(url_for('lab_dashboard'))
+
+        elif user and bcrypt.check_password_hash(user.password, password):
+            login_user(user)
+            session['role'] = 'user'
+            flash('User login successful!', 'success')
+            return redirect(url_for('user_dashboard'))
+
+        else:
+            flash('Invalid credentials', 'danger')
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    session.pop('role', None)
+    flash('You have been logged out', 'info')
+    return redirect(url_for('login'))
+
+# --- Registration ---
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form['name']
+        mobile = request.form['mobile']
+        password = request.form['password']
+        role = request.form.get('form_type')
+        print(role)
+
+        hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
+
+        try:
+            if role == 'doctor':
+                new_user = Doctor(name=name, mobile=mobile, password=hashed_pw)
+            elif role == 'laboratory':
+                new_user = Laboratory(name=name, mobile=mobile, password=hashed_pw)
+            else:
+                new_user = User(name=name, mobile=mobile, password=hashed_pw)
+
+            db.session.add(new_user)
+            db.session.commit()
+            flash(f'{role.capitalize()} registered successfully!', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            print(f"Registration Error: {e}")
+            flash('Error during registration. Try again.', 'danger')
+
+    return render_template('register.html')
+
+# --- Dashboards ---
+@app.route('/doctor_dashboard')
+@login_required
+def doctor_dashboard():
+    if session.get('role') != 'doctor':
+        flash('Unauthorized access', 'danger')
+        return redirect(url_for('login'))
+    return render_template('doctor_dashboard.html')
+
+@app.route('/lab_dashboard')
+@login_required
+def lab_dashboard():
+    if session.get('role') != 'laboratory':
+        flash('Unauthorized access', 'danger')
+        return redirect(url_for('login'))
+    return render_template('lab_dashboard.html')
+
+@app.route('/user_dashboard')
+@login_required
+def user_dashboard():
+    if session.get('role') != 'user':
+        flash('Unauthorized access', 'danger')
+        return redirect(url_for('login'))
+    return render_template('user_dashboard.html')
+
+# --- Run App ---
 if __name__ == '__main__':
     app.run(debug=True)

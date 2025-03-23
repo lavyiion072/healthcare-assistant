@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | HealthCare Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg,rgba(117, 230, 238, 0.32) 0%,rgb(45, 131, 252) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 420px;
+            color: #fff;
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card h4 {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 30px;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            border: none;
+            padding-left: 40px;
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.35);
+            color: #fff;
+            box-shadow: none;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-icon {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            color: #ffffff;
+            font-size: 1.2rem;
+        }
+
+        .btn-custom {
+            background: #ffffff;
+            color: #4e54c8;
+            font-weight: 600;
+            border-radius: 12px;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background: #e0e0e0;
+            color: #4e54c8;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            color: #ffffff;
+        }
+
+        .logo-text {
+            font-weight: bold;
+            font-size: 26px;
+            color: #ffffff;
+            margin-top: 10px;
+        }
+
+        .register-link {
+            margin-top: 25px;
+            font-size: 14px;
+        }
+
+        .register-link a {
+            color: #fff;
+            font-weight: 600;
+            text-decoration: underline;
+            transition: 0.3s;
+        }
+
+        .register-link a:hover {
+            color: #d1d1d1;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="mb-4">
+            <i class="bi bi-heart-pulse-fill logo"></i>
+            <div class="logo-text">HealthCare Portal</div>
+        </div>
+        <h4>Login to Your Account</h4>
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <i class="bi bi-phone form-icon"></i>
+                <input type="text" class="form-control" name="mobile" placeholder="Mobile Number" required>
+            </div>
+            <div class="form-group">
+                <i class="bi bi-lock form-icon"></i>
+                <input type="password" class="form-control" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-custom w-100 mt-2">Login</button>
+        </form>
+
+        <div class="register-link">
+            New Here? <a href="/register">Create an account</a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

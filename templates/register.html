@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration | HealthCare Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #e0f7fa, #ffffff);
+            margin: 0;
+            padding: 0;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .tab-container {
+            max-width: 900px;
+            margin: 50px auto;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 119, 182, 0.2);
+            overflow: hidden;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #caf0f8;
+            border-bottom: 2px solid #90e0ef;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #023e8a;
+            transition: background 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: #00b4d8;
+            color: white;
+        }
+
+        .form-section {
+            display: none;
+            padding: 30px;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0077b6;
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #023e8a;
+            display: block;
+            margin-top: 15px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="password"],
+        input[type="checkbox"],
+        input[type="tel"],
+        .form-select,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #90e0ef;
+            border-radius: 8px;
+            background-color: #f0f9ff;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            border-color: #00b4d8;
+            outline: none;
+        }
+
+        button {
+            background: #00b4d8;
+            color: #ffffff;
+            border: none;
+            padding: 12px 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #0077b6;
+        }
+        .input-group-text {
+            background-color: #90e0ef;
+            border: none;
+            border-radius: 10px 0 0 10px;
+            color: #023e8a;
+        }
+        #map {
+            height: 300px;
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid #90e0ef;
+        }        
+    </style>
+</head>
+
+<body>
+
+    <!-- Main Tab Container -->
+    <div class="tab-container">
+        <div class="tabs">
+            <div class="tab {% if active_tab == 0 %}active{% endif %}" onclick="showTab(0)">💊 Doctor</div>
+            <div class="tab {% if active_tab == 1 %}active{% endif %}" onclick="showTab(1)">🔍 Patient</div>
+            <div class="tab {% if active_tab == 2 %}active{% endif %}" onclick="showTab(2)">🩺 Laboratory</div>
+        </div>
+
+        <!-- Doctor Registration Form -->
+        <div class="form-section {% if active_tab == 0 %}active{% endif %}">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-plus-fill" style="font-size: 2rem; color: #0077b6;"></i>
+                <h3 class="form-title mt-2">Doctor Registration</h3>
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="form_type" value="doctor">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="Full name" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Designation</label>
+                    <input type="text" name="designation" class="form-control" placeholder="e.g., Cardiologist" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Specialization</label>
+                    <input type="text" name="specialization" class="form-control" placeholder="e.g., Heart Surgery" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Degree</label>
+                    <input type="text" name="degree" class="form-control" placeholder="e.g., MBBS, MD" required>
+                </div>
+
+                <!-- Timing Slot -->
+                <div class="mb-3 row">
+                    <label class="form-label">Slot Timing (24 Hours)</label>
+                    <div class="col-md-6 mb-2">
+                        <select name="start_time" class="form-select" required>
+                            <option value="">Start Time</option>
+                            {% for hour in range(0, 24) %}
+                                <option value="{{ "%02d:00"|format(hour) }}">{{ "%02d:00"|format(hour) }}</option>
+                                <option value="{{ "%02d:30"|format(hour) }}">{{ "%02d:30"|format(hour) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <select name="end_time" class="form-select" required>
+                            <option value="">End Time</option>
+                            {% for hour in range(0, 24) %}
+                                <option value="{{ "%02d:00"|format(hour) }}">{{ "%02d:00"|format(hour) }}</option>
+                                <option value="{{ "%02d:30"|format(hour) }}">{{ "%02d:30"|format(hour) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Weekly Availability -->
+                <div class="mb-3">
+                    <label class="form-label">Weekly Availability</label>
+                    <div class="day-checks d-flex flex-wrap">
+                        {% for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
+                        <div class="form-check me-3 mb-2" style="display:flex; padding-left:0px;">
+                            <input class="form-check-input" type="checkbox" style="width:0%; margin-left:0px;" name="availability" value="{{ day }}" id="{{ day }}">
+                            <label class="form-check-label" for="{{ day }}" style="margin-left:5px; margin-top:10px;">{{ day }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Location Inputs -->
+                <div class="mb-3">
+                    <label class="form-label">Service Location</label>
+                    <input type="text" name="service_location" class="form-control" placeholder="e.g., Ahmedabad" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Clinic Location</label>
+                    <input type="text" name="clinic_location" class="form-control" placeholder="e.g., Gota, Ahmedabad" required>
+                </div>
+
+                <!-- Map -->
+                <div class="mb-3">
+                    <label class="form-label">Set Location on Map</label>
+                    <div id="map"></div>
+                </div>
+
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+
+                <!-- Appointment Availability -->
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" style="width:3em !important; margin-top:0px; margin-right:2%;" name="appointment_available" id="appointmentSwitch">
+                    <label class="form-check-label" for="appointmentSwitch">Appointment Available</label>
+                </div>
+
+                <!-- Fee -->
+                <div class="mb-3">
+                    <label class="form-label">Standard Fee</label>
+                    <div class="input-group">
+                        <span class="input-group-text">₹</span>
+                        <input type="number" name="standard_fee" class="form-control" style="margin-top:0px" placeholder="e.g., 500" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Emergency Fee</label>
+                    <div class="input-group">
+                        <span class="input-group-text">₹</span>
+                        <input type="number" name="emergency_fee" class="form-control" style="margin-top:0px" placeholder="e.g., 1000" required>
+                    </div>
+                </div>
+
+                <!-- Contact -->
+                <div class="mb-3">
+                    <label class="form-label">Mobile Number</label>
+                    <input type="tel" name="mobile" class="form-control" placeholder="9876543210" pattern="[0-9]{10}" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Strong password" required>
+                </div>
+
+                <button type="submit">Register as Doctor</button>
+            </form>
+        </div>
+
+        <!-- Patient Registration Form -->
+        <div class="form-section {% if active_tab == 1 %}active{% endif %}">
+            <div class="text-center mb-4">
+                <i class="bi bi-person-circle" style="font-size: 2rem; color: #0077b6;"></i>
+                <h3 class="form-title mt-2">User Registration</h3>
+            </div>
+            
+            <form method="POST">
+                <input type="hidden" name="form_type" value="user">
+                <!-- Name -->
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                        <input type="text" name="name" class="form-control" placeholder="Your full name" required>
+                    </div>
+                </div>
+        
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope-fill"></i></span>
+                        <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
+                    </div>
+                </div>
+        
+                <!-- Mobile -->
+                <div class="mb-3">
+                    <label class="form-label">Mobile Number</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-telephone-fill"></i></span>
+                        <input type="tel" name="mobile" class="form-control" placeholder="9876543210" pattern="[0-9]{10}" required>
+                    </div>
+                </div>
+        
+                <!-- Password -->
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                        <input type="password" name="password" class="form-control" placeholder="Create a password" required>
+                    </div>
+                </div>
+        
+                <!-- Confirm Password -->
+                <div class="mb-4">
+                    <label class="form-label">Confirm Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" name="confirm_password" class="form-control" placeholder="Confirm password" required>
+                    </div>
+                </div>
+        
+                <!-- Submit -->
+                <button type="submit">Register as Patient</button>
+            </form>
+        </div>
+
+        <!-- Laboratory Registration Form -->
+        <div class="form-section {% if active_tab == 2 %}active{% endif %}">
+            <div class="text-center mb-4">
+                <i class="bi bi-hospital" style="font-size: 2rem; color: #0077b6;"></i>
+                <h3 class="form-title mt-2">Laboratory Registration</h3>
+            </div>
+            
+            <form method="POST">
+                <input type="hidden" name="form_type" value="laboratory">
+                <!-- Lab Info -->
+                <div class="form-group">
+                    <label for="lab_name">Lab Name:</label>
+                    <input type="text" name="lab_name" id="lab_name" required>
+                </div>
+        
+                <div class="form-group">
+                    <label for="lab_head">Lab Head Name:</label>
+                    <input type="text" name="lab_head" id="lab_head" required>
+                </div>
+        
+                <div class="form-group">
+                    <label for="specialization">Specialization:</label>
+                    <input type="text" name="specialization" id="specialization" placeholder="e.g. Pathology, Radiology" required>
+                </div>
+        
+                <!-- Timing -->
+                <div class="form-group">
+                    <label>Slot Timing (24 Hours):</label>
+                    <div style="display: flex; gap: 10px;">
+                        <select name="start_time" required style="flex:1;">
+                            <option value="">Start Time</option>
+                            {% for hour in range(0, 24) %}
+                                <option value="{{ "%02d:00"|format(hour) }}">{{ "%02d:00"|format(hour) }}</option>
+                                <option value="{{ "%02d:30"|format(hour) }}">{{ "%02d:30"|format(hour) }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="end_time" required style="flex:1;">
+                            <option value="">End Time</option>
+                            {% for hour in range(0, 24) %}
+                                <option value="{{ "%02d:00"|format(hour) }}">{{ "%02d:00"|format(hour) }}</option>
+                                <option value="{{ "%02d:30"|format(hour) }}">{{ "%02d:30"|format(hour) }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+        
+                <!-- Availability -->
+                <div class="form-group">
+                    <label>Weekly Availability:</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        {% for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
+                        <div>
+                            <input type="checkbox" name="availability" value="{{ day }}" id="{{ day }}">
+                            <label for="{{ day }}">{{ day }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+        
+                <!-- Service Location -->
+                <div class="form-group">
+                    <label for="service_location">Service Location:</label>
+                    <input type="text" name="service_location" id="service_location" required>
+                </div>
+        
+                <!-- Map -->
+                <div class="mb-3">
+                    <label class="form-label">Set Location on Map</label>
+                    <div id="map"></div>
+                </div>
+
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+        
+                <!-- Address -->
+                <div class="form-group">
+                    <label for="lab_address">Lab Address:</label>
+                    <input type="text" name="lab_address" id="lab_address" required>
+                </div>
+        
+                <!-- Home Sample -->
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" name="home_sample_available" id="home_sample_available">
+                    <label for="home_sample_available">Home Sample Collection Available</label>
+                </div>
+        
+                <!-- Fees -->
+                <div class="form-group">
+                    <label for="standard_fee">Standard Test Fee (₹):</label>
+                    <input type="number" name="standard_fee" id="standard_fee" required>
+                </div>
+        
+                <div class="form-group">
+                    <label for="emergency_fee">Emergency Test Fee (₹):</label>
+                    <input type="number" name="emergency_fee" id="emergency_fee">
+                </div>
+        
+                <!-- Contact -->
+                <div class="form-group">
+                    <label for="mobile">Contact Number:</label>
+                    <input type="text" name="mobile" id="mobile" required>
+                </div>
+        
+                <div class="form-group">
+                    <label for="password">Set Password:</label>
+                    <input type="password" name="password" id="password" required>
+                </div>
+        
+                <button type="submit">Register as Laboratory</button>
+            </form>
+        </div>
+        <div class="text-center mt-3">
+            <small>Already have an account? <a href="/login" class="text-primary fw-bold">Login</a></small>
+        </div>
+    </div>
+
+    <script>
+        function showTab(index) {
+            // Save tab index to localStorage
+            localStorage.setItem('activeTab', index);
+    
+            // Get all tab and form-section elements
+            const tabs = document.querySelectorAll('.tab');
+            const sections = document.querySelectorAll('.form-section');
+    
+            tabs.forEach((tab, i) => {
+                if (i === index) {
+                    tab.classList.add('active');
+                    sections[i].classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                    sections[i].classList.remove('active');
+                }
+            });
+        }
+    
+        // On page load, show the saved tab
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTab = localStorage.getItem('activeTab');
+            const defaultTab = savedTab ? parseInt(savedTab) : 0;
+            showTab(defaultTab);
+        });
+
+        function updateFileName() {
+            const fileInput = document.getElementById('report');
+            const fileNameDisplay = document.getElementById('file-name');
+            const fileName = fileInput.files[0]?.name || 'No file selected';
+            fileNameDisplay.textContent = fileName;
+        }
+    </script>    
+    <!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+<script>
+    var map, marker;
+
+    // Function to initialize the map with a given latitude and longitude
+    function initMap(lat, lng) {
+        map = L.map('map').setView([lat, lng], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+        // Set initial lat/lng
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+
+        // Update hidden inputs when marker is dragged
+        marker.on('dragend', function (e) {
+            var latlng = marker.getLatLng();
+            document.getElementById('latitude').value = latlng.lat;
+            document.getElementById('longitude').value = latlng.lng;
+        });
+    }
+
+    // Request user location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                initMap(lat, lng);
+            },
+            function (error) {
+                // If permission denied or any error, default to Ahmedabad
+                console.warn('Geolocation failed or denied. Defaulting to Ahmedabad.');
+                initMap(23.0225, 72.5714);
+            }
+        );
+    } else {
+        // Geolocation not supported, fallback to default location
+        console.warn('Geolocation not supported by this browser. Defaulting to Ahmedabad.');
+        initMap(23.0225, 72.5714);
+    }
+</script>
+</body>
+</html>
