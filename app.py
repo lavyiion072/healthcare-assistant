@@ -135,7 +135,7 @@ def load_user(user_id):
         return User.query.get(int(user_id))
 
 # --- Index Route ---
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/prediction-model', methods=['GET', 'POST'])
 def index():
     medicine_result = None
     disease_result = None
@@ -240,52 +240,76 @@ def logout():
     session.pop('role', None)
     flash('You have been logged out', 'info')
     return redirect(url_for('login'))
-
-# --- Registration ---
+ 
+# --- Registration with Validations ---
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        name = request.form['name']
-        mobile = request.form['mobile']
-        password = request.form['password']
-        designation = request.form['designation']
-        specialization = request.form['specialization']
-        degree = request.form['degree']
-        start_time = request.form['start_time']
-        end_time = request.form['end_time']
-        availability = request.form['availability']
-        service_area = request.form['service_location']
-        clinic_location = request.form['clinic_location']
-        latitude = request.form['latitude']
-        longitude = request.form['longitude']
-        appointment_available = request.form['appointment_available']
-        standard_fee = request.form['standard_fee']
-        emergency_fee = request.form['emergency_fee']
-        role = request.form.get('form_type')
-        print(role)
+        name = request.form.get('name', '').strip()
+        mobile = request.form.get('mobile', '').strip()
+        password = request.form.get('password', '').strip()
+        designation = request.form.get('designation', '').strip()
+        specialization = request.form.get('specialization', '').strip()
+        degree = request.form.get('degree', '').strip()
+        start_time = request.form.get('start_time', '').strip()
+        end_time = request.form.get('end_time', '').strip()
+        availability = request.form.get('availability', '').strip()
+        service_area = request.form.get('service_location', '').strip()
+        clinic_location = request.form.get('clinic_location', '').strip()
+        latitude = request.form.get('latitude', '').strip()
+        longitude = request.form.get('longitude', '').strip()
+        appointment_available = request.form.get('appointment_available', '').strip()
+        standard_fee = request.form.get('standard_fee', '').strip()
+        emergency_fee = request.form.get('emergency_fee', '').strip()
+        role = request.form.get('form_type', '').strip()
+        
+        errors = []
 
+        # --- Basic Validations ---
+        if not name:
+            errors.append("Name is required.")
+        if not mobile or not mobile.isdigit() or len(mobile) != 10:
+            errors.append("Valid 10-digit mobile number is required.")
+        if not password or len(password) < 6:
+            errors.append("Password must be at least 6 characters.")
+        if role not in ['doctor', 'laboratory', 'user']:
+            errors.append("Invalid role selected.")
+
+        # --- Doctor-Specific Validations ---
+        if role == 'doctor':
+            required_fields = [designation, specialization, degree, start_time, end_time,
+                               availability, service_area, clinic_location, latitude, longitude,
+                               appointment_available, standard_fee, emergency_fee]
+            if not all(required_fields):
+                errors.append("All fields are required for doctor registration.")
+            try:
+                float(latitude)
+                float(longitude)
+                float(standard_fee)
+                float(emergency_fee)
+            except ValueError:
+                errors.append("Latitude, longitude, and fees must be valid numbers.")
+
+        # --- If Errors, Show Messages ---
+        if errors:
+            for error in errors:
+                flash(error, 'danger')
+            return render_template('register.html')  # Keep the filled form if needed
+
+        # --- If Valid, Proceed with Registration ---
         hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
 
         try:
             if role == 'doctor':
-                new_user = Doctor(name=name, 
-                                  mobile=mobile, 
-                                  password=hashed_pw, 
-                                  designation=designation, 
-                                  specialization=specialization,
-                                  degree=degree,
-                                  start_time=start_time,
-                                  end_time=end_time,
-                                  availability=availability,
-                                  service_area=service_area,
-                                  clinic_location=clinic_location,
-                                  latitude=latitude,
-                                  longitude=longitude,
-                                  appointment_available=appointment_available,
-                                  standard_fee=standard_fee,
-                                  emergency_fee=emergency_fee
-                                  )
-                
+                new_user = Doctor(
+                    name=name, mobile=mobile, password=hashed_pw, 
+                    designation=designation, specialization=specialization, 
+                    degree=degree, start_time=start_time, end_time=end_time, 
+                    availability=availability, service_area=service_area, 
+                    clinic_location=clinic_location, latitude=latitude, 
+                    longitude=longitude, appointment_available=appointment_available, 
+                    standard_fee=standard_fee, emergency_fee=emergency_fee
+                )
             elif role == 'laboratory':
                 new_user = Laboratory(name=name, mobile=mobile, password=hashed_pw)
             else:
@@ -295,6 +319,7 @@ def register():
             db.session.commit()
             flash(f'{role.capitalize()} registered successfully!', 'success')
             return redirect(url_for('login'))
+
         except Exception as e:
             print(f"Registration Error: {e}")
             flash('Error during registration. Try again.', 'danger')
@@ -328,8 +353,11 @@ def update_profile():
         doctor.degree = request.form['degree']
         doctor.start_time = request.form['start_time']
         doctor.end_time = request.form['end_time']
-        # doctor.appointment_available= request.form['appointment_available']
-        doctor.availability = request.form['availability']
+        appointment_value = request.form.get('appointment_available')
+        doctor.appointment_available = True if appointment_value == 'on' else False
+        availability_list = request.form.getlist('availability[]')
+        availability_str = ",".join(availability_list)
+        doctor.availability = availability_str
         doctor.service_area = request.form['service_location']
         doctor.clinic_location = request.form['clinic_location']
         doctor.latitude = request.form['latitude']
