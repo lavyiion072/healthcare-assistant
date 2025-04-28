@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Healthcare Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> <!-- FontAwesome CDN -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: ghostwhite; /* Ghostwhite background */
+            color: #333;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        header {
+            background-color: #5dade2; /* Light blue color for header */
+            padding: 20px 10%;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #3498db;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        nav a {
+            margin-left: 30px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.2rem;
+            position: relative;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: #3498db;
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover {
+            color: #3498db;
+            transform: translateY(-3px);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 120px 10%;
+            height: 80vh;
+            color: white;
+            background: linear-gradient(135deg, rgba(83, 169, 226, 0.9), rgba(230, 240, 245, 0.7)); /* Light blue gradient */
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .hero-content h2 {
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            font-weight: 800;
+            line-height: 1.2;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .hero-content p {
+            font-size: 1.6rem;
+            margin-bottom: 30px;
+            line-height: 1.8;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .btn-login {
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #3498db, #2980b9); /* Gradient button */
+            color: white;
+            font-size: 1.4rem;
+            text-decoration: none;
+            border-radius: 50px;
+            text-transform: uppercase;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            animation: fadeIn 2s ease-out;
+        }
+
+        .btn-login:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+            transform: translateY(-4px);
+        }
+
+        .robot-animation {
+            width: 350px;
+            height: 350px;
+            animation: float 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        footer {
+            background-color: #5dade2; /* Light blue for footer */
+            color: white;
+            text-align: center;
+            padding: 40px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .features {
+            padding: 80px 15%;
+            text-align: center;
+            background-color: #ffffff;
+            margin-top: -60px;
+            transition: all 0.3s ease;
+        }
+
+        .features h2 {
+            font-size: 3.2rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+            color: #2C3E50;
+        }
+
+        .features p {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 50px;
+        }
+
+        .feature-cards {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .card {
+            width: 30%;
+            background-color: #3498db;;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .card p {
+            font-size: 1.1rem;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .card i {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .contact-section {
+            padding: 80px 15%;
+            background-color: #5dade2; /* Light blue background for contact section */
+            color: white;
+            text-align: center;
+            margin-top: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-section h2 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .contact-section p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+
+        .contact-section a {
+            background-color: #3498db; /* Light blue for contact button */
+            padding: 20px 45px;
+            color: white;
+            font-size: 1.4rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease;
+        }
+
+        .contact-section a:hover {
+            background-color: #2980b9; /* Darker blue on hover */
+        }
+
+        .hospital-theme {
+            background-color: #3498db;
+            background-size: cover;
+            background-position: center;
+            padding: 120px 10%;
+            color: black;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .hospital-theme h2 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color:white;
+        }
+
+        .hospital-theme p {
+            font-size: 1.4rem;
+            line-height: 1.7;
+            margin-bottom: 40px;
+            color:white;
+        }
+
+        .hospital-theme a {
+            background-color: white;
+            padding: 20px 45px;
+            color: #3498db;
+            font-size: 1.3rem;
+            text-decoration: none;
+            border-radius: 30px;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .hospital-theme a:hover {
+            background-color: #2980b9;
+            color:white;
+        }
+
+        .pricing {
+            padding: 80px 15%;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        
+        .pricing h2 {
+            font-size: 3.2rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+            color: #2C3E50;
+        }
+        
+        .pricing p {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 50px;
+        }
+        
+        .pricing-cards {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .plan {
+            background-color: #3498db;
+            color: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            width: 30%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+        }
+        
+        .plan.popular::before {
+            content: "Most Popular";
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #e67e22;
+            color: white;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 30px;
+        }
+        
+        .plan:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .plan h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color:#fff;
+        }
+        
+        .plan .price {
+            font-size: 2.8rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+            color:#fff;
+        }
+        
+        .plan .price span {
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+        
+        .plan ul {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .plan ul li {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .btn-plan {
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        
+        .btn-plan:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+        }
+        
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <h1>AI Healthcare</h1>
+        </div>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/login">Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h2>AI-powered Healthcare Predictions</h2>
+                <p>Make the right healthcare decisions using artificial intelligence.</p>
+                <a href="/login" class="btn-login">Get Started</a>
+            </div>
+            <div class="hero-image">
+                <img src="{{ url_for('static', filename='images/robot.png') }}" alt="AI Robot" class="robot-animation">
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Our Features</h2>
+            <p>Transforming healthcare with AI</p>
+            <div class="feature-cards">
+                <div class="card">
+                    <i class="fas fa-stethoscope"></i> <!-- FontAwesome icon -->
+                    <h3>AI Diagnostics</h3>
+                    <p>Get accurate diagnostics powered by AI.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-procedures"></i> <!-- FontAwesome icon -->
+                    <h3>Predictive Treatment</h3>
+                    <p>AI models predict the best treatment options.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-user-md"></i> <!-- FontAwesome icon -->
+                    <h3>Personalized Care</h3>
+                    <p>Tailored healthcare solutions based on your unique needs.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="contact-section">
+            <h2>Contact Us</h2>
+            <p>If you have any questions, feel free to reach out to us!</p>
+            <a href="mailto:contact@aihealthcare.com">Contact Us</a>
+        </section>
+        <section class="pricing">
+            <h2>Our Pricing Plans</h2>
+            <p>Affordable healthcare solutions powered by AI</p>
+            <div class="pricing-cards">
+                <div class="plan">
+                    <h3>Basic</h3>
+                    <p class="price">$19<span>/month</span></p>
+                    <ul>
+                        <li>Basic Diagnostics</li>
+                        <li>Access to AI Consultations</li>
+                        <li>Email Support</li>
+                    </ul>
+                    <a href="/signup" class="btn-plan">Choose Plan</a>
+                </div>
+                <div class="plan popular">
+                    <h3>Standard</h3>
+                    <p class="price">$49<span>/month</span></p>
+                    <ul>
+                        <li>Advanced Diagnostics</li>
+                        <li>Predictive Treatment Plans</li>
+                        <li>Priority Support</li>
+                    </ul>
+                    <a href="/signup" class="btn-plan">Choose Plan</a>
+                </div>
+                <div class="plan">
+                    <h3>Premium</h3>
+                    <p class="price">$99<span>/month</span></p>
+                    <ul>
+                        <li>All Features Included</li>
+                        <li>Personalized Care Programs</li>
+                        <li>24/7 Dedicated Support</li>
+                    </ul>
+                    <a href="/signup" class="btn-plan">Choose Plan</a>
+                </div>
+            </div>
+        </section>
+        
+        <section class="hospital-theme">
+            <h2>Hospital-grade Predictions</h2>
+            <p>Leveraging AI to provide hospital-grade prediction models for your healthcare needs.</p>
+            <a href="/learn-more">Learn More</a>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 AI Healthcare. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>

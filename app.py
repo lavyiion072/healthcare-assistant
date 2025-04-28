@@ -135,7 +135,7 @@ def load_user(user_id):
         return User.query.get(int(user_id))
 
 # --- Index Route ---
-@app.route('/prediction-model', methods=['GET', 'POST'])
+@app.route('/predict', methods=['GET', 'POST'])
 def index():
     medicine_result = None
     disease_result = None
@@ -244,23 +244,13 @@ def logout():
 # --- Registration with Validations ---
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    doctors= Doctor.query.all()
+    print(doctors)
+    print(request.method)
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         mobile = request.form.get('mobile', '').strip()
         password = request.form.get('password', '').strip()
-        designation = request.form.get('designation', '').strip()
-        specialization = request.form.get('specialization', '').strip()
-        degree = request.form.get('degree', '').strip()
-        start_time = request.form.get('start_time', '').strip()
-        end_time = request.form.get('end_time', '').strip()
-        availability = request.form.get('availability', '').strip()
-        service_area = request.form.get('service_location', '').strip()
-        clinic_location = request.form.get('clinic_location', '').strip()
-        latitude = request.form.get('latitude', '').strip()
-        longitude = request.form.get('longitude', '').strip()
-        appointment_available = request.form.get('appointment_available', '').strip()
-        standard_fee = request.form.get('standard_fee', '').strip()
-        emergency_fee = request.form.get('emergency_fee', '').strip()
         role = request.form.get('form_type', '').strip()
         
         errors = []
@@ -294,13 +284,27 @@ def register():
         if errors:
             for error in errors:
                 flash(error, 'danger')
-            return render_template('register.html')  # Keep the filled form if needed
+            return render_template('register.html', doctor= Doctor.query.all())  # Keep the filled form if needed
 
         # --- If Valid, Proceed with Registration ---
         hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
 
         try:
             if role == 'doctor':
+                designation = request.form.get('designation', '').strip()
+                specialization = request.form.get('specialization', '').strip()
+                degree = request.form.get('degree', '').strip()
+                start_time = request.form.get('start_time', '').strip()
+                end_time = request.form.get('end_time', '').strip()
+                availability = request.form.get('availability', '').strip()
+                service_area = request.form.get('service_location', '').strip()
+                clinic_location = request.form.get('clinic_location', '').strip()
+                latitude = request.form.get('latitude', '').strip()
+                longitude = request.form.get('longitude', '').strip()
+                appointment_available = request.form.get('appointment_available', '').strip()
+                standard_fee = request.form.get('standard_fee', '').strip()
+                emergency_fee = request.form.get('emergency_fee', '').strip()
+                
                 new_user = Doctor(
                     name=name, mobile=mobile, password=hashed_pw, 
                     designation=designation, specialization=specialization, 
@@ -313,6 +317,19 @@ def register():
             elif role == 'laboratory':
                 new_user = Laboratory(name=name, mobile=mobile, password=hashed_pw)
             else:
+                age = request.form.get('age', '').strip()
+                location = request.form.get('location', '').strip()
+                blood_group = request.form.get('blood_group', '').strip()
+                last_disease = request.form.get('last_disease', '').strip()
+                other_health_data = request.form.get('other_health_data', '').strip()
+                recommended_doctor = request.form.get('recommended_doctor', '').strip()
+                recommended_laboratory = request.form.get('recommended_laboratory', '').strip()
+                clinic_location = request.form.get('clinic_location', '').strip()
+                latitude = request.form.get('latitude', '').strip()
+                longitude = request.form.get('longitude', '').strip()
+                appointment_available = request.form.get('appointment_available', '').strip()
+                standard_fee = request.form.get('standard_fee', '').strip()
+                emergency_fee = request.form.get('emergency_fee', '').strip()
                 new_user = User(name=name, mobile=mobile, password=hashed_pw)
 
             db.session.add(new_user)
@@ -323,8 +340,9 @@ def register():
         except Exception as e:
             print(f"Registration Error: {e}")
             flash('Error during registration. Try again.', 'danger')
-
-    return render_template('register.html')
+    else:
+        return render_template('register.html', doctor=doctors)
+    return render_template('register.html', doctor=doctors)
 
 # --- Dashboards ---
 @app.route('/doctor_dashboard')
@@ -387,6 +405,9 @@ def user_dashboard():
         return redirect(url_for('login'))
     return render_template('user_dashboard.html')
 
+@app.route('/')
+def web():
+    return render_template('web.html')
 # --- Run App ---
 if __name__ == '__main__':
     app.run(debug=True)
