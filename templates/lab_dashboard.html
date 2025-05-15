@@ -31,6 +31,7 @@
       font-weight: 500;
       padding: 12px 20px;
       border-radius: 8px;
+      cursor: pointer;
     }
 
     .sidebar .nav-link:hover, .sidebar .nav-link.active {
@@ -98,6 +99,10 @@
     .btn-gradient:hover {
       background: linear-gradient(180deg, rgb(15, 125, 250), rgb(5, 83, 252));
     }
+    #map, #map-laboratory {
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
@@ -107,62 +112,918 @@
       <i class="bi bi-flask-fill me-2"></i> LabPortal
     </div>
     <nav class="nav flex-column">
-      <a class="nav-link active" href="#"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
-      <a class="nav-link" href="#"><i class="bi bi-file-medical me-2"></i>Test Orders</a>
-      <a class="nav-link" href="#"><i class="bi bi-droplet-half me-2"></i>Samples</a>
-      <a class="nav-link" href="#"><i class="bi bi-journal-text me-2"></i>Reports</a>
-      <a class="nav-link" href="#"><i class="bi bi-person-lines-fill me-2"></i>Patients</a>
-      <a class="nav-link" href="#"><i class="bi bi-gear me-2"></i>Settings</a>
+      <a class="nav-link active" data-section="dashboard-section"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+      <a class="nav-link" data-section="test-orders-section"><i class="bi bi-file-medical me-2"></i>Test Orders</a>
+      <a class="nav-link" data-section="samples-section"><i class="bi bi-droplet-half me-2"></i>Samples</a>
+      <a class="nav-link" data-section="reports-section"><i class="bi bi-journal-text me-2"></i>Reports</a>
+      <a class="nav-link" data-section="patients-section"><i class="bi bi-person-lines-fill me-2"></i>Patients</a>
+      <a class="nav-link" data-section="profile-section"><i class="bi bi-person-circle me-2"></i>Profile</a>
       <a class="nav-link" href="logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
     </nav>
   </div>
 
   <!-- Main Content -->
   <div class="main-content">
-    <div class="mb-4 welcome-text">Welcome, {{lab.lab_name}}</div>
+    <!-- Dashboard -->
+    <div id="dashboard-section" class="content-section">
+      <div class="mb-4 welcome-text">Welcome, {{lab.lab_name}}</div>
+      <div class="row g-4 mb-4">
+        <!-- Pending Tests -->
+        <div class="col-md-3">
+          <div class="card card-custom p-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-hourglass-split text-warning fs-2 me-3"></i>
+              <div>
+                <h6 class="card-title">Pending Tests</h6>
+                <h4>24</h4>
+                <small class="text-muted">Tests awaiting sample collection or processing</small>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <!-- Info Cards -->
-    <div class="row g-4 mb-4">
-      <div class="col-md-4">
-        <div class="card card-custom p-4">
-          <div class="d-flex align-items-center">
-            <i class="bi bi-hourglass-split text-warning fs-2 me-3"></i>
-            <div>
-              <h6 class="card-title">Pending Tests</h6>
-              <h4>24</h4>
+        <!-- Tests In Progress -->
+        <div class="col-md-3">
+          <div class="card card-custom p-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-gear-fill text-primary fs-2 me-3"></i>
+              <div>
+                <h6 class="card-title">Tests In Progress</h6>
+                <h4>15</h4>
+                <small class="text-muted">Currently running tests in the lab</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completed Reports -->
+        <div class="col-md-3">
+          <div class="card card-custom p-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-file-check-fill text-success fs-2 me-3"></i>
+              <div>
+                <h6 class="card-title">Completed Reports</h6>
+                <h4>120</h4>
+                <small class="text-muted">Reports generated and delivered</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Critical Reports -->
+        <div class="col-md-3">
+          <div class="card card-custom p-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-exclamation-triangle-fill text-danger fs-2 me-3"></i>
+              <div>
+                <h6 class="card-title">Critical Reports</h6>
+                <h4>3</h4>
+                <small class="text-muted">Reports requiring urgent attention</small>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card card-custom p-4">
-          <div class="d-flex align-items-center">
-            <i class="bi bi-file-check-fill text-success fs-2 me-3"></i>
-            <div>
-              <h6 class="card-title">Completed Reports</h6>
-              <h4>120</h4>
+
+      <div class="row g-4 mb-4">
+        <!-- Total Patients -->
+        <div class="col-md-6">
+          <div class="card card-custom p-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-people-fill text-info fs-2 me-3"></i>
+              <div>
+                <h6 class="card-title">Total Patients Registered</h6>
+                <h4>320</h4>
+                <small class="text-muted">All-time registered patient count</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Patients Registered -->
+        <div class="col-md-6">
+          <div class="card card-custom p-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-person-plus-fill text-secondary fs-2 me-3"></i>
+              <div>
+                <h6 class="card-title">New Patients This Month</h6>
+                <h4>27</h4>
+                <small class="text-muted">Patients registered in the last 30 days</small>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="card card-custom p-4">
-          <div class="d-flex align-items-center">
-            <i class="bi bi-people-fill text-info fs-2 me-3"></i>
-            <div>
-              <h6 class="card-title">Total Patients</h6>
-              <h4>320</h4>
-            </div>
+
+      <!-- Recent Test Orders Table -->
+      <div class="card card-custom p-4 mb-4">
+        <h5 class="card-title mb-3">Recent Test Orders</h5>
+        <div class="table-responsive">
+          <table class="table table-striped align-middle">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Patient Name</th>
+                <th>Test Type</th>
+                <th>Order Date</th>
+                <th>Status</th>
+                <th>Report Due</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Example rows - populate dynamically -->
+              <tr>
+                <td>#12345</td>
+                <td>Rahul Sharma</td>
+                <td>Blood Test</td>
+                <td>2025-05-12</td>
+                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                <td>2025-05-17</td>
+              </tr>
+              <tr>
+                <td>#12344</td>
+                <td>Meera Patel</td>
+                <td>COVID-19 PCR</td>
+                <td>2025-05-10</td>
+                <td><span class="badge bg-primary">In Progress</span></td>
+                <td>2025-05-15</td>
+              </tr>
+              <tr>
+                <td>#12343</td>
+                <td>Arjun Desai</td>
+                <td>Thyroid Panel</td>
+                <td>2025-05-08</td>
+                <td><span class="badge bg-success">Completed</span></td>
+                <td>2025-05-12</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <!-- Tests Status Pie Chart -->
+        <div class="col-md-6">
+          <div class="card card-custom p-4">
+            <h5 class="card-title mb-3">Tests Status Distribution</h5>
+            <canvas id="testsStatusChart" height="250"></canvas>
+          </div>
+        </div>
+
+        <!-- Monthly Test Orders Bar Chart -->
+        <div class="col-md-6">
+          <div class="card card-custom p-4">
+            <h5 class="card-title mb-3">Monthly Test Orders (Last 6 months)</h5>
+            <canvas id="monthlyOrdersChart" height="250"></canvas>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Placeholder for future content -->
-    <div class="card card-custom p-4">
-      <h5 class="card-title mb-3">Recent Test Orders</h5>
-      <p>This section can be populated with dynamic test order data.</p>
+    <div id="test-orders-section" class="content-section" style="display: none;">
+      <div class="card card-custom p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="card-title m-0">Test Orders</h4>
+          <input type="text" class="form-control w-auto" id="searchTestOrders" placeholder="Search by Patient or Test">
+        </div>
+
+        <!-- Add Test Order Form -->
+        <form id="testOrderForm" class="row g-3 mb-4">
+          <div class="col-md-4">
+            <input type="text" class="form-control" placeholder="Patient Name" id="patientName" required>
+          </div>
+          <div class="col-md-4">
+            <input type="text" class="form-control" placeholder="Test Name" id="testName" required>
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="testStatus" required>
+              <option value="">Select Status</option>
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+          <div class="col-md-1">
+            <button type="submit" class="btn btn-primary w-100">Add</button>
+          </div>
+        </form>
+
+        <!-- Table Section -->
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered align-middle text-center">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Patient Name</th>
+                <th>Test Name</th>
+                <th>Status</th>
+                <th>Ordered On</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="testOrdersTable">
+              <tr>
+                <td>1</td>
+                <td>Ravi Patel</td>
+                <td>Blood Sugar</td>
+                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                <td>2025-05-10</td>
+                <td>
+                  <button class="btn btn-sm btn-info">View</button>
+                  <button class="btn btn-sm btn-success">Mark Completed</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Nikita Shah</td>
+                <td>Thyroid Panel</td>
+                <td><span class="badge bg-primary">In Progress</span></td>
+                <td>2025-05-13</td>
+                <td>
+                  <button class="btn btn-sm btn-info">View</button>
+                  <button class="btn btn-sm btn-success">Mark Completed</button>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Aman Joshi</td>
+                <td>COVID-19 PCR</td>
+                <td><span class="badge bg-success">Completed</span></td>
+                <td>2025-05-12</td>
+                <td>
+                  <button class="btn btn-sm btn-info">View</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+
+    <div id="samples-section" class="content-section" style="display: none;">
+      <div class="card card-custom p-4">
+
+        <!-- Header + Filters -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+          <h4 class="card-title m-0">Samples</h4>
+        </div>
+
+        <!-- Add Sample Form -->
+        <form id="addSampleForm" class="mb-4">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <input type="text" class="form-control" placeholder="Sample ID" required>
+            </div>
+            <div class="col-md-3">
+              <input type="text" class="form-control" placeholder="Patient Name" required>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" required>
+                <option value="" disabled selected>Select Test Type</option>
+                <option>Blood</option>
+                <option>Urine</option>
+                <option>Swab</option>
+                <option>Saliva</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <input type="date" class="form-control" required>
+            </div>
+            <div class="col-md-1 d-grid">
+              <button type="submit" class="btn btn-primary">Add</button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Sample Table -->
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered align-middle text-center">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Sample ID</th>
+                <th>Patient Name</th>
+                <th>Test Type</th>
+                <th>Status</th>
+                <th>Collected On</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="samplesTable">
+              <tr>
+                <td>1</td>
+                <td>SMP-001</td>
+                <td>Ravi Patel</td>
+                <td>Blood</td>
+                <td><span class="badge bg-warning text-dark">Pending</span></td>
+                <td>2025-05-10</td>
+                <td>
+                  <button class="btn btn-sm btn-info">View</button>
+                  <button class="btn btn-sm btn-success">Mark Received</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>SMP-002</td>
+                <td>Nikita Shah</td>
+                <td>Urine</td>
+                <td><span class="badge bg-primary">In Transit</span></td>
+                <td>2025-05-12</td>
+                <td>
+                  <button class="btn btn-sm btn-info">View</button>
+                  <button class="btn btn-sm btn-success">Mark Received</button>
+                </td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>SMP-003</td>
+                <td>Aman Joshi</td>
+                <td>Swab</td>
+                <td><span class="badge bg-success">Received</span></td>
+                <td>2025-05-11</td>
+                <td>
+                  <button class="btn btn-sm btn-info">View</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="reports-section" class="content-section" style="display: none;">
+      <div class="card card-custom p-4">
+
+        <!-- Header + Filters -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+          <h4 class="card-title m-0">Reports</h4>
+        </div>
+
+        <!-- Upload Report Form -->
+        <form id="uploadReportForm" class="mb-4">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <input type="text" class="form-control" placeholder="Patient Name" required>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" required>
+                <option value="" disabled selected>Select Report Type</option>
+                <option>Blood Test</option>
+                <option>Thyroid Panel</option>
+                <option>COVID-19</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <input type="date" class="form-control" required>
+            </div>
+            <div class="col-md-2">
+              <input type="file" class="form-control" required>
+            </div>
+            <div class="col-md-1 d-grid">
+              <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Reports Table -->
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered align-middle text-center">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Patient Name</th>
+                <th>Report Type</th>
+                <th>Date</th>
+                <th>Report File</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reportsTable">
+              <tr>
+                <td>1</td>
+                <td>Ravi Patel</td>
+                <td>Blood Test</td>
+                <td>2025-05-10</td>
+                <td><a href="#" class="btn btn-sm btn-secondary">Download</a></td>
+                <td>
+                  <button class="btn btn-sm btn-info">View</button>
+                  <button class="btn btn-sm btn-danger">Delete</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Nikita Shah</td>
+                <td>Thyroid Panel</td>
+                <td>2025-05-12</td>
+                <td><a href="#" class="btn btn-sm btn-secondary">Download</a></td>
+                <td>
+                  <button class="btn btn-sm btn-info">View</button>
+                  <button class="btn btn-sm btn-danger">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="patients-section" class="content-section" style="display: none;">
+      <div class="card card-custom p-4">
+        
+        <!-- Header + Search -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+          <h4 class="card-title m-0">Patients</h4>
+          <input type="text" class="form-control w-auto" id="searchPatients" placeholder="Search by Name or Phone">
+        </div>
+
+        <!-- Add Patient Form -->
+        <form id="addPatientForm" class="mb-4">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <input type="text" class="form-control" placeholder="Full Name" required>
+            </div>
+            <div class="col-md-2">
+              <input type="number" class="form-control" placeholder="Age" required>
+            </div>
+            <div class="col-md-2">
+              <select class="form-select" required>
+                <option value="" disabled selected>Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <input type="text" class="form-control" placeholder="Phone Number" required>
+            </div>
+            <div class="col-md-2 d-grid">
+              <button type="submit" class="btn btn-primary">Add Patient</button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Patients Table -->
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered align-middle text-center">
+            <thead class="table-dark">
+              <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Phone</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="patientsTable">
+              <tr>
+                <td>1</td>
+                <td>Ravi Patel</td>
+                <td>35</td>
+                <td>Male</td>
+                <td>9876543210</td>
+                <td>
+                  <button class="btn btn-sm btn-info">View</button>
+                  <button class="btn btn-sm btn-danger">Delete</button>
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Nikita Shah</td>
+                <td>29</td>
+                <td>Female</td>
+                <td>9123456789</td>
+                <td>
+                  <button class="btn btn-sm btn-info">View</button>
+                  <button class="btn btn-sm btn-danger">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <section id="profile-section" class="content-section" style="display: none;">
+      <h4 class="card-title mb-4">Profile</h4>
+      <form method="POST" novalidate>
+        <input type="hidden" name="form_type" value="laboratory" />
+
+        <!-- Lab Info -->
+        <div class="mb-3">
+          <label for="lab_name" class="form-label">Lab Name:</label>
+          <input
+            type="text"
+            name="name"
+            id="lab_name"
+            class="form-control"
+            value="{{ lab.lab_name }}"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="lab_head" class="form-label">Lab Head Name:</label>
+          <input
+            type="text"
+            name="lab_head"
+            id="lab_head"
+            class="form-control"
+            value="{{ lab.lab_head }}"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label for="specialization" class="form-label">Specialization:</label>
+          <input
+            type="text"
+            name="specialization"
+            id="specialization"
+            class="form-control"
+            value="{{ lab.specialization }}"
+            required
+          />
+        </div>
+
+        <!-- Timing -->
+        <div class="mb-4">
+          <label class="form-label d-block">Slot Timing (24 Hours):</label>
+          <div class="d-flex gap-2">
+            <select
+              name="start_time"
+              id="start_time"
+              class="form-select"
+              required
+              style="flex:1;"
+            >
+              <option value="" disabled selected>Start Time</option>
+              {% for hour in range(0, 24) %}
+                <option
+                  value="{{ '%02d:00'|format(hour) }}"
+                  {% if lab.start_time == '%02d:00'|format(hour) %}selected{% endif %}
+                >
+                  {{ '%02d:00'|format(hour) }}
+                </option>
+                <option
+                  value="{{ '%02d:30'|format(hour) }}"
+                  {% if lab.start_time == '%02d:30'|format(hour) %}selected{% endif %}
+                >
+                  {{ '%02d:30'|format(hour) }}
+                </option>
+              {% endfor %}
+            </select>
+            <select
+              name="end_time"
+              id="end_time"
+              class="form-select"
+              required
+              style="flex:1;"
+            >
+              <option value="" disabled selected>End Time</option>
+              {% for hour in range(0, 24) %}
+                <option
+                  value="{{ '%02d:00'|format(hour) }}"
+                  {% if lab.end_time == '%02d:00'|format(hour) %}selected{% endif %}
+                >
+                  {{ '%02d:00'|format(hour) }}
+                </option>
+                <option
+                  value="{{ '%02d:30'|format(hour) }}"
+                  {% if lab.end_time == '%02d:30'|format(hour) %}selected{% endif %}
+                >
+                  {{ '%02d:30'|format(hour) }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Weekly Availability -->
+        <div class="mb-4">
+          <label class="form-label d-block">Weekly Availability:</label>
+          <div class="d-flex flex-wrap gap-3">
+            {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+              <div class="form-check">
+                <input
+                  type="checkbox"
+                  name="availability"
+                  value="{{ day }}"
+                  id="{{ day }}"
+                  class="form-check-input"
+                  {% if day in lab.availability %}checked{% endif %}
+                />
+                <label for="{{ day }}" class="form-check-label">{{ day }}</label>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Service Location -->
+        <div class="mb-3">
+          <label for="service_location" class="form-label">Service Location:</label>
+          <input
+            type="text"
+            name="service_location"
+            id="service_location"
+            class="form-control"
+            value="{{ lab.service_location }}"
+            required
+          />
+        </div>
+
+        <!-- Map -->
+        <div class="mb-3">
+          <label class="form-label">Set Location on Map</label>
+          <div id="map" style="height: 300px; border-radius: 10px; border: 1px solid #ccc;"></div>
+        </div>
+        <input type="hidden" name="latitude" id="latitude" value="{{lab.latitude}}">
+        <input type="hidden" name="longitude" id="longitude" value="{{lab.longitude}}">
+
+        <div class="mb-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="laboratory_latitude" class="form-label">Latitude:</label>
+              <input
+                type="number"
+                id="laboratory_latitude"
+                name="latitude"
+                class="form-control"
+                step="any"
+                value="{{ lab.latitude }}"
+                required
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="laboratory_longitude" class="form-label">Longitude:</label>
+              <input
+                type="number"
+                id="laboratory_longitude"
+                name="longitude"
+                class="form-control"
+                step="any"
+                value="{{ lab.longitude }}"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Lab Address -->
+        <div class="mb-3">
+          <label for="lab_address" class="form-label">Lab Address:</label>
+          <input
+            type="text"
+            name="lab_address"
+            id="lab_address"
+            class="form-control"
+            value="{{ lab.lab_address }}"
+            required
+          />
+        </div>
+
+        <!-- Home Sample Collection -->
+        <div class="form-check mb-4">
+          <input
+            type="checkbox"
+            name="home_sample_available"
+            id="home_sample_available"
+            class="form-check-input"
+            {% if lab.home_sample_available %}checked{% endif %}
+          />
+          <label for="home_sample_available" class="form-check-label">
+            Home Sample Collection Available
+          </label>
+        </div>
+
+        <!-- Fees -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="standard_fee" class="form-label">Standard Test Fee (₹):</label>
+            <input
+              type="number"
+              name="standard_fee"
+              id="standard_fee"
+              class="form-control"
+              value="{{ lab.standard_fee }}"
+              required
+              min="0"
+            />
+          </div>
+          <div class="col-md-6">
+            <label for="emergency_fee" class="form-label">Emergency Test Fee (₹):</label>
+            <input
+              type="number"
+              name="emergency_fee"
+              id="emergency_fee"
+              class="form-control"
+              value="{{ lab.emergency_fee }}"
+              min="0"
+              placeholder="Optional"
+            />
+          </div>
+        </div>
+
+        <!-- Contact -->
+        <div class="mb-3">
+          <label for="mobile" class="form-label">Contact Number:</label>
+          <input
+            type="tel"
+            name="mobile"
+            id="mobile"
+            class="form-control"
+            value="{{ lab.mobile }}"
+            required
+            pattern="[0-9+ -]+"
+            title="Enter a valid contact number"
+          />
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="form-label">Set Password:</label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            class="form-control"
+            value="{{ lab.password }}"
+            required
+            minlength="6"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-success">Update Lab Profile</button>
+      </form>
+    </section>
   </div>
+
+  <!-- JavaScript for toggling sections -->
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const navLinks = document.querySelectorAll('.nav-link[data-section]');
+      const sections = document.querySelectorAll('.content-section');
+
+      navLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+
+          // Remove 'active' from all links
+          navLinks.forEach(l => l.classList.remove('active'));
+          this.classList.add('active');
+
+          // Hide all sections
+          sections.forEach(sec => sec.style.display = 'none');
+
+          // Show selected section
+          const targetId = this.getAttribute('data-section');
+          const target = document.getElementById(targetId);
+          if (target) target.style.display = 'block';
+        });
+      });
+    });
+
+    var map, marker;
+
+        // Function to initialize the map with a given latitude and longitude
+        function initMap(lat, lng) {
+            map = L.map('map').setView([lat, lng], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+            }).addTo(map);
+
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            // Set initial lat/lng
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+
+            // Update hidden inputs when marker is dragged
+            marker.on('dragend', function (e) {
+                var latlng = marker.getLatLng();
+                document.getElementById('latitude').value = latlng.lat;
+                document.getElementById('longitude').value = latlng.lng;
+            });
+        }
+
+        // Request user location
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    initMap(lat, lng);
+                },
+                function (error) {
+                    // If permission denied or any error, default to Ahmedabad
+                    console.warn('Geolocation failed or denied. Defaulting to Ahmedabad.');
+                    initMap(23.0225, 72.5714);
+                }
+            );
+        } else {
+            // Geolocation not supported, fallback to default location
+            console.warn('Geolocation not supported by this browser. Defaulting to Ahmedabad.');
+            initMap(23.0225, 72.5714);
+        }
+  </script>
+  <script>
+    // Tests Status Pie Chart
+    const ctxStatus = document.getElementById('testsStatusChart').getContext('2d');
+    const testsStatusChart = new Chart(ctxStatus, {
+      type: 'doughnut',
+      data: {
+        labels: ['Pending', 'In Progress', 'Completed', 'Critical'],
+        datasets: [{
+          label: 'Tests Status',
+          data: [24, 15, 120, 3], // example data - replace with dynamic values
+          backgroundColor: [
+            'rgba(255, 193, 7, 0.7)',   // Warning - Yellow
+            'rgba(13, 110, 253, 0.7)',  // Primary - Blue
+            'rgba(25, 135, 84, 0.7)',   // Success - Green
+            'rgba(220, 53, 69, 0.7)'    // Danger - Red
+          ],
+          borderColor: [
+            'rgba(255, 193, 7, 1)',
+            'rgba(13, 110, 253, 1)',
+            'rgba(25, 135, 84, 1)',
+            'rgba(220, 53, 69, 1)'
+          ],
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+
+    // Monthly Test Orders Bar Chart
+    const ctxMonthly = document.getElementById('monthlyOrdersChart').getContext('2d');
+    const monthlyOrdersChart = new Chart(ctxMonthly, {
+      type: 'bar',
+      data: {
+        labels: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May'], // example months
+        datasets: [{
+          label: 'Test Orders',
+          data: [110, 120, 90, 130, 140, 125], // example data
+          backgroundColor: 'rgba(13, 110, 253, 0.7)', // blue bars
+          borderColor: 'rgba(13, 110, 253, 1)',
+          borderWidth: 1,
+          borderRadius: 5
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 20 }
+          }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  </script>
+  <script>
+    document.getElementById('testOrderForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const patient = document.getElementById('patientName').value.trim();
+      const test = document.getElementById('testName').value.trim();
+      const status = document.getElementById('testStatus').value;
+      const table = document.getElementById('testOrdersTable');
+
+      if (!patient || !test || !status) return;
+
+      const statusBadge = {
+        'Pending': '<span class="badge bg-warning text-dark">Pending</span>',
+        'In Progress': '<span class="badge bg-primary">In Progress</span>',
+        'Completed': '<span class="badge bg-success">Completed</span>'
+      };
+
+      const newRow = document.createElement('tr');
+      newRow.innerHTML = `
+        <td>${table.rows.length + 1}</td>
+        <td>${patient}</td>
+        <td>${test}</td>
+        <td>${statusBadge[status]}</td>
+        <td>${new Date().toISOString().slice(0, 10)}</td>
+        <td>
+          <button class="btn btn-sm btn-info">View</button>
+          ${status !== 'Completed' ? '<button class="btn btn-sm btn-success">Mark Completed</button>' : ''}
+        </td>
+      `;
+
+      table.appendChild(newRow);
+      this.reset();
+    });
+  </script>
+
 </body>
 </html>

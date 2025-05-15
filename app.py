@@ -440,7 +440,7 @@ def doctor_dashboard():
 
 @app.route('/doctor_dashboard', methods=['GET', 'POST'])
 @login_required
-def update_profile():
+def update_doctor_profile():
     doctor_id = session['doctor_id']
     doctor = Doctor.query.get(doctor_id)
     if not doctor:
@@ -479,7 +479,38 @@ def lab_dashboard():
         flash('Unauthorized access', 'danger')
         return redirect(url_for('login'))
     currentlab = current_user
+    session['lab_id'] = currentlab.id
     return render_template('lab_dashboard.html', lab=currentlab)
+
+@app.route('/lab_dashboard', methods=['GET', 'POST'])
+@login_required
+def update_lab_profile():
+    lab_id = session['lab_id']
+    laboratory = Laboratory.query.get(lab_id)
+    if not laboratory:
+        flash('Laboratory not found!')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        
+        laboratory.lab_name = request.form.get('name', '').strip()
+        laboratory.lab_head = request.form.get('lab_head', '').strip()
+        laboratory.specialization = request.form.get('specialization', '').strip()
+        laboratory.start_time = request.form.get('start_time', '').strip()
+        laboratory.end_time = request.form.get('end_time', '').strip()
+        laboratory.weekly_availability = request.form.get('availability', '').strip()
+        laboratory.service_location = request.form.get('service_location', '').strip()
+        laboratory.lab_address = request.form.get('lab_address', '').strip()
+        laboratory.latitude = request.form.get('latitude', '').strip()
+        laboratory.longitude = request.form.get('longitude', '').strip()
+        laboratory.home_sample_available = request.form.get('home_sample_available', 'off') == 'on'
+        laboratory.standard_fee = request.form.get('standard_fee', '').strip()
+        laboratory.emergency_fee = request.form.get('emergency_fee', '0').strip()
+        
+        db.session.commit()
+        flash('Profile updated successfully!')
+        return redirect(url_for('lab_dashboard'))
+    return render_template('lab_dashboard.html', laboratory=laboratory)
 
 #User Management
 @app.route('/user_dashboard')
