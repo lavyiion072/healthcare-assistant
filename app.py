@@ -51,7 +51,18 @@ symptom_index = pickle.load(open("symptom_index.pkl", "rb"))
 report_model = pickle.load(open("report_diagnosis_model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-# --- Helper Functions ---
+# --- Login Loader ---
+@login_manager.user_loader
+def load_user(user_id):
+    role = session.get('role')
+    if role == 'doctor':
+        return Doctor.query.get(int(user_id))
+    elif role == 'laboratory':
+        return Laboratory.query.get(int(user_id))
+    else:
+        return User.query.get(int(user_id))
+
+# --- Prediction of model ---
 def suggest_medicines(symptom, age_group, severity, duration):
     known_symptoms = list(symptom_enc.classes_)
     matched = get_close_matches(symptom.lower(), known_symptoms, n=1, cutoff=0.6)
@@ -88,11 +99,11 @@ def suggest_medicines(symptom, age_group, severity, duration):
             'quantity_2': row['quantity_2'],
             'recommended_tests': row['tests_suggested'] if pd.notna(row['tests_suggested']) else 'No tests recommended'
         }
-        
     except Exception as e:
         print(f"Prediction Error: {e}")
         return None
     return result
+
 def predict_disease(symptoms):
     input_data = [0] * len(symptom_index)
     all_known_symptoms = list(symptom_index.keys())
@@ -123,18 +134,6 @@ def predict_from_report(text):
     prediction = report_model.predict(transformed_text)[0]
     return prediction
 
-# --- Login Loader ---
-@login_manager.user_loader
-def load_user(user_id):
-    role = session.get('role')
-    if role == 'doctor':
-        return Doctor.query.get(int(user_id))
-    elif role == 'laboratory':
-        return Laboratory.query.get(int(user_id))
-    else:
-        return User.query.get(int(user_id))
-
-# --- Index Route ---
 @app.route('/predict', methods=['GET', 'POST'])
 def index():
     medicine_result = None
@@ -233,6 +232,7 @@ def login():
             flash('Invalid credentials', 'danger')
     return render_template('login.html')
 
+# Logout from system
 @app.route('/logout')
 @login_required
 def logout():
@@ -427,8 +427,7 @@ def register():
             flash('Error during registration. Try again.', 'danger')
     return render_template('register.html', alldoctors=doctors, alllaboratories=laboratories)
 
-
-# --- Dashboards ---
+#Doctor Management
 @app.route('/doctor_dashboard')
 @login_required
 def doctor_dashboard():
@@ -472,7 +471,7 @@ def update_profile():
         return redirect(url_for('doctor_dashboard'))
     return render_template('doctor_dashboard.html', doctor=doctor)
 
-
+#Lab Management
 @app.route('/lab_dashboard')
 @login_required
 def lab_dashboard():
@@ -482,6 +481,7 @@ def lab_dashboard():
     currentlab = current_user
     return render_template('lab_dashboard.html', lab=currentlab)
 
+#User Management
 @app.route('/user_dashboard')
 @login_required
 def user_dashboard():
@@ -490,6 +490,7 @@ def user_dashboard():
         return redirect(url_for('login'))
     return render_template('user_dashboard.html')
 
+#CMS Website
 @app.route('/')
 def web():
     return render_template('web.html')
