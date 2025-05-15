@@ -88,11 +88,11 @@ def suggest_medicines(symptom, age_group, severity, duration):
             'quantity_2': row['quantity_2'],
             'recommended_tests': row['tests_suggested'] if pd.notna(row['tests_suggested']) else 'No tests recommended'
         }
-        return result
+        
     except Exception as e:
         print(f"Prediction Error: {e}")
         return None
-
+    return result
 def predict_disease(symptoms):
     input_data = [0] * len(symptom_index)
     all_known_symptoms = list(symptom_index.keys())
@@ -244,15 +244,17 @@ def logout():
 # --- Registration with Validations ---
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    doctors= Doctor.query.all()
-    print(doctors)
-    print(request.method)
+    print("Registration called")
+    doctors = Doctor.query.all()
+    laboratories = Laboratory.query.all()
     if request.method == 'POST':
+        print("Request is Post called")
         name = request.form.get('name', '').strip()
+        print("Name", name)
         mobile = request.form.get('mobile', '').strip()
         password = request.form.get('password', '').strip()
         role = request.form.get('form_type', '').strip()
-        
+
         errors = []
 
         # --- Basic Validations ---
@@ -264,85 +266,167 @@ def register():
             errors.append("Password must be at least 6 characters.")
         if role not in ['doctor', 'laboratory', 'user']:
             errors.append("Invalid role selected.")
-
-        # --- Doctor-Specific Validations ---
+        print("Validation passed", errors)
+        # --- Role-Specific Validations ---
         if role == 'doctor':
+            # Extract doctor-specific fields
+            designation = request.form.get('designation', '').strip()
+            specialization = request.form.get('specialization', '').strip()
+            degree = request.form.get('degree', '').strip()
+            start_time = request.form.get('start_time', '').strip()
+            end_time = request.form.get('end_time', '').strip()
+            availability = request.form.get('availability', '').strip()
+            service_area = request.form.get('service_location', '').strip()
+            clinic_location = request.form.get('clinic_location', '').strip()
+            latitude = request.form.get('latitude', '').strip()
+            longitude = request.form.get('longitude', '').strip()
+            appointment_available = request.form.get('appointment_available', 'off') == 'on'
+            standard_fee = request.form.get('standard_fee', '').strip()
+            emergency_fee = request.form.get('emergency_fee', '').strip()
+
             required_fields = [designation, specialization, degree, start_time, end_time,
-                               availability, service_area, clinic_location, latitude, longitude,
-                               appointment_available, standard_fee, emergency_fee]
+                               availability, service_area, clinic_location, latitude,
+                               longitude, standard_fee, emergency_fee]
+
             if not all(required_fields):
-                errors.append("All fields are required for doctor registration.")
+                errors.append("All doctor fields are required.")
+
             try:
-                float(latitude)
-                float(longitude)
-                float(standard_fee)
-                float(emergency_fee)
+                latitude = float(latitude)
+                longitude = float(longitude)
+                standard_fee = float(standard_fee)
+                emergency_fee = float(emergency_fee)
             except ValueError:
                 errors.append("Latitude, longitude, and fees must be valid numbers.")
 
-        # --- If Errors, Show Messages ---
+        elif role == 'laboratory':
+            print("Lab condition called")
+            lab_name = request.form.get('name', '').strip()
+            lab_head = request.form.get('lab_head', '').strip()
+            specialization = request.form.get('specialization', '').strip()
+            start_time = request.form.get('start_time', '').strip()
+            end_time = request.form.get('end_time', '').strip()
+            weekly_availability = request.form.get('availability', '').strip()
+            service_location = request.form.get('service_location', '').strip()
+            lab_address = request.form.get('lab_address', '').strip()
+            latitude = request.form.get('latitude', '').strip()
+            longitude = request.form.get('longitude', '').strip()
+            home_sample_available = request.form.get('home_sample_available', 'off') == 'on'
+            standard_fee = request.form.get('standard_fee', '').strip()
+            emergency_fee = request.form.get('emergency_fee', '0').strip()
+
+            required_fields = [lab_name, lab_head, specialization, start_time, end_time,
+                               weekly_availability, service_location, lab_address,
+                               latitude, longitude, standard_fee]
+            
+            print("All Fields", lab_name, lab_head, specialization, start_time, end_time,
+                               weekly_availability, service_location, lab_address,
+                               latitude, longitude, standard_fee)
+            
+            if not all(required_fields):
+                errors.append("All laboratory fields are required.")
+            print("Internal lab validation passed.", errors)
+            try:
+                latitude = float(latitude)
+                longitude = float(longitude)
+                standard_fee = int(standard_fee)
+                emergency_fee = int(emergency_fee) if emergency_fee else 0
+            except ValueError:
+                errors.append("Latitude, longitude, and fees must be valid numbers.")
+            print("Exit from Lab", errors)
+        elif role == 'user':
+            age = request.form.get('age', '').strip()
+            location = request.form.get('location', '').strip()
+            blood_group = request.form.get('blood_group', '').strip()
+            last_disease = request.form.get('last_disease', '').strip()
+            other_health_data = request.form.get('other_health_data', '').strip()
+            recommended_doctor = request.form.get('recommended_doctor', '').strip()
+            recommended_laboratory = request.form.get('recommended_laboratory', '').strip()
+            latitude = request.form.get('latitude', '').strip()
+            longitude = request.form.get('longitude', '').strip()
+
+            try:
+                age = int(age) if age else None
+                latitude = float(latitude) if latitude else None
+                longitude = float(longitude) if longitude else None
+            except ValueError:
+                errors.append("Age, latitude, and longitude must be valid numbers.")
+
+        # --- If Any Validation Errors ---
         if errors:
             for error in errors:
                 flash(error, 'danger')
-            return render_template('register.html', doctor= Doctor.query.all())  # Keep the filled form if needed
-
-        # --- If Valid, Proceed with Registration ---
+            return render_template('register.html', doctors=doctors, laboratories=laboratories)
+        print("All Validation passed", errors)
+        # --- Password Hashing ---
         hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
 
+        # --- Create Role-Specific User Entry ---
         try:
             if role == 'doctor':
-                designation = request.form.get('designation', '').strip()
-                specialization = request.form.get('specialization', '').strip()
-                degree = request.form.get('degree', '').strip()
-                start_time = request.form.get('start_time', '').strip()
-                end_time = request.form.get('end_time', '').strip()
-                availability = request.form.get('availability', '').strip()
-                service_area = request.form.get('service_location', '').strip()
-                clinic_location = request.form.get('clinic_location', '').strip()
-                latitude = request.form.get('latitude', '').strip()
-                longitude = request.form.get('longitude', '').strip()
-                appointment_available = request.form.get('appointment_available', '').strip()
-                standard_fee = request.form.get('standard_fee', '').strip()
-                emergency_fee = request.form.get('emergency_fee', '').strip()
-                
                 new_user = Doctor(
-                    name=name, mobile=mobile, password=hashed_pw, 
-                    designation=designation, specialization=specialization, 
-                    degree=degree, start_time=start_time, end_time=end_time, 
-                    availability=availability, service_area=service_area, 
-                    clinic_location=clinic_location, latitude=latitude, 
-                    longitude=longitude, appointment_available=appointment_available, 
-                    standard_fee=standard_fee, emergency_fee=emergency_fee
+                    name=name,
+                    mobile=mobile,
+                    password=hashed_pw,
+                    designation=designation,
+                    specialization=specialization,
+                    degree=degree,
+                    start_time=start_time,
+                    end_time=end_time,
+                    availability=availability,
+                    service_area=service_area,
+                    clinic_location=clinic_location,
+                    latitude=latitude,
+                    longitude=longitude,
+                    appointment_available=appointment_available,
+                    standard_fee=standard_fee,
+                    emergency_fee=emergency_fee
                 )
             elif role == 'laboratory':
-                new_user = Laboratory(name=name, mobile=mobile, password=hashed_pw)
+                new_user = Laboratory(
+                    lab_name=lab_name,
+                    lab_head=lab_head,
+                    specialization=specialization,
+                    start_time=start_time,
+                    end_time=end_time,
+                    weekly_availability=weekly_availability,
+                    service_location=service_location,
+                    lab_address=lab_address,
+                    latitude=latitude,
+                    longitude=longitude,
+                    home_sample_available=home_sample_available,
+                    standard_fee=standard_fee,
+                    emergency_fee=emergency_fee,
+                    mobile=mobile,
+                    password=hashed_pw
+                )
+                print("Database passed", errors)
             else:
-                age = request.form.get('age', '').strip()
-                location = request.form.get('location', '').strip()
-                blood_group = request.form.get('blood_group', '').strip()
-                last_disease = request.form.get('last_disease', '').strip()
-                other_health_data = request.form.get('other_health_data', '').strip()
-                recommended_doctor = request.form.get('recommended_doctor', '').strip()
-                recommended_laboratory = request.form.get('recommended_laboratory', '').strip()
-                clinic_location = request.form.get('clinic_location', '').strip()
-                latitude = request.form.get('latitude', '').strip()
-                longitude = request.form.get('longitude', '').strip()
-                appointment_available = request.form.get('appointment_available', '').strip()
-                standard_fee = request.form.get('standard_fee', '').strip()
-                emergency_fee = request.form.get('emergency_fee', '').strip()
-                new_user = User(name=name, mobile=mobile, password=hashed_pw)
+                new_user = User(
+                    name=name,
+                    age=age,
+                    mobile=mobile,
+                    location=location,
+                    latitude=latitude,
+                    longitude=longitude,
+                    blood_group=blood_group,
+                    last_disease=last_disease,
+                    other_health_data=other_health_data,
+                    recommended_doctor=recommended_doctor,
+                    recommended_laboratory=recommended_laboratory,
+                    password=hashed_pw
+                )
 
             db.session.add(new_user)
             db.session.commit()
             flash(f'{role.capitalize()} registered successfully!', 'success')
             return redirect(url_for('login'))
-
+        
         except Exception as e:
             print(f"Registration Error: {e}")
             flash('Error during registration. Try again.', 'danger')
-    else:
-        return render_template('register.html', doctor=doctors)
-    return render_template('register.html', doctor=doctors)
+    return render_template('register.html', alldoctors=doctors, alllaboratories=laboratories)
+
 
 # --- Dashboards ---
 @app.route('/doctor_dashboard')
@@ -395,7 +479,8 @@ def lab_dashboard():
     if session.get('role') != 'laboratory':
         flash('Unauthorized access', 'danger')
         return redirect(url_for('login'))
-    return render_template('lab_dashboard.html')
+    currentlab = current_user
+    return render_template('lab_dashboard.html', lab=currentlab)
 
 @app.route('/user_dashboard')
 @login_required

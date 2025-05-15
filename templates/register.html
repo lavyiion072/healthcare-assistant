@@ -281,10 +281,9 @@
 
         <!-- Patient Registration Form -->
         <div class="form-section {% if active_tab == 1 %}active{% endif %}">
-            <div class="mb-4 welcome-text">Welcome, {{doctor.name}}</div>
             <div class="text-center mb-4">
                 <i class="bi bi-person-circle" style="font-size: 2rem; color: #0077b6;"></i>
-                <h3 class="form-title mt-2">User Registration {{doctor.name}}</h3>
+                <h3 class="form-title mt-2">User Registration</h3>
             </div>
             
             <form action="/register" method="POST">
@@ -315,7 +314,7 @@
               
                 <!-- Medical Info -->
                 <label for="blood_group">Blood Group:</label>
-                <input type="text" id="blood_group" name="blood_group" value="{{doctor.name}}" placeholder="e.g., A+, B-, O+">
+                <input type="text" id="blood_group" name="blood_group" value="" placeholder="e.g., A+, B-, O+">
               
                 <label for="last_disease">Last Known Disease:</label>
                 <input type="text" id="last_disease" name="last_disease" placeholder="Enter last known disease">
@@ -326,15 +325,15 @@
                 <!-- Recommendations -->
                 <label for="recommended_doctor">Recommended Doctor:</label>
                 <select id="recommended_doctor" name="recommended_doctor[]" multiple>
-                    {% for doctor in doctors %}
+                    {% for doctor in alldoctors %}
                         <option value="{{ doctor.id }}">{{ doctor.name }}</option>
                     {% endfor %}
                 </select>
               
                 <label for="recommended_laboratory">Recommended Laboratory:</label>
                 <select id="recommended_laboratory" name="recommended_laboratory[]" multiple>
-                    {% for lab in laboratories %}
-                        <option value="{{ lab.id }}">{{ lab.name }}</option>
+                    {% for lab in alllaboratories %}
+                        <option value="{{ lab.id }}">{{ lab.lab_name }}</option>
                     {% endfor %}
                 </select>
               
@@ -359,7 +358,7 @@
                 <!-- Lab Info -->
                 <div class="form-group">
                     <label for="lab_name">Lab Name:</label>
-                    <input type="text" name="lab_name" id="lab_name" required>
+                    <input type="text" name="name" id="lab_name" required>
                 </div>
         
                 <div class="form-group">
